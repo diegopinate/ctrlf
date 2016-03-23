@@ -46,7 +46,8 @@ function searchCaption(field, captionTrack)
 function getCaptionTrack(videoId, trackId)
 {
 	var accessToken = "ACCESS_TOKEN";
-	var devKey		= "DEVELOPER_KEY";
+	// Diego Sosa's key
+	var devKey		= "AIzaSyDWuGMteyvJY65erI4Y_Iu0y5hgVSj2ESQ";
 
 	var host = 'gdata.youtube.com/feeds/api/videos/' + videoId + '/captiondata/' + trackId;
 	var auth = 'Bearer ' + accessToken;
