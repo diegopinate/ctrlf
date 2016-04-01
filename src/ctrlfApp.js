@@ -4,14 +4,13 @@ Controller for Ctrl-F app.
 var app = angular.module('ctrlfApp', []);
 app.controller('mainPageController', function($scope,$http){
 	// Authorization info from Oauth
-	/*
 	$scope.auth = {
 		oauth: {
-			access_token: undefined,
-			expires_in: undefined,
-			account_username: undefined
+			access_token: "",
+			expires_in: "",
+			account_username: ""
 		}
-	};*/
+	}
 
 	/**
 	* Formats a full caption text into a list of strings
@@ -87,7 +86,7 @@ app.controller('mainPageController', function($scope,$http){
 					account_username: parameterMap.account_username
 				}
 			};
-			window.localStorage.setItem("google", JSON.stringify($scope.auth));
+			window.localStorage.setItem("auth", JSON.stringify($scope.auth));
 			window.location.href = "http://localhost/Ctrl-F/ctrlf/src/main.html";
 		} else {
 			alert("Problem authenticating");
