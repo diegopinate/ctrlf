@@ -3,14 +3,8 @@ Controller for Ctrl-F app.
 */
 var app = angular.module('ctrlfApp', []);
 app.controller('mainPageController', function($scope,$http){
-	// Authorization info from Oauth
-	$scope.auth = {
-		oauth: {
-			access_token: "",
-			expires_in: "",
-			account_username: ""
-		}
-	}
+	// This will contain a list with all IDs of the available captions
+	$scope.captionList = undefined;
 
 	/**
 	* Formats a full caption text into a list of strings
@@ -30,7 +24,7 @@ app.controller('mainPageController', function($scope,$http){
 	{
 		var result = captionText.split("\n\n");
 		return result;
-	}
+	};
 
 	/**
 	* Searches a captionTrack (Array of strings)
@@ -61,7 +55,7 @@ app.controller('mainPageController', function($scope,$http){
 		}
 	
 		return times;
-	}
+	};
 
 	/**
 	* Oauth2 Callback
@@ -79,19 +73,19 @@ app.controller('mainPageController', function($scope,$http){
 		}
 		if(parameterMap.access_token !== undefined && parameterMap.access_token !== null) {
 			console.log("Got access tokens!");
-			$scope.auth = {
+			auth = {
 				oauth: {
 					access_token: parameterMap.access_token,
 					expires_in: parameterMap.expires_in,
 					account_username: parameterMap.account_username
 				}
 			};
-			window.localStorage.setItem("auth", JSON.stringify($scope.auth));
+			window.localStorage.setItem("auth", JSON.stringify(auth));
 			window.location.href = "http://localhost/Ctrl-F/ctrlf/src/main.html";
 		} else {
 			alert("Problem authenticating");
 		}
-	}
+	};
 
 	/**
 	* Debug function
@@ -99,7 +93,9 @@ app.controller('mainPageController', function($scope,$http){
 	$scope.printAuth = function()
 	{
 		console.log("$scope.auth: " + JSON.stringify($scope.auth));
-	}
+		localAuth = window.localStorage.getItem("auth");
+		console.log("Local storage: " + JSON.stringify(localAuth));
+	};
 
 
 	/**
@@ -107,24 +103,47 @@ app.controller('mainPageController', function($scope,$http){
 	* and the Track ID. This method should asynchronously process the track
 	* and add the clickable times to the site somehow
 	*
-	* @methodName getCaptionTrack
+	* @methodName requestCaptionTrack
 	* @param videoId The youtube video ID
 	* @param trackId The caption track ID (needs to be obtained from the track list)
 	*/
-	getCaptionTrack = function(videoId, trackId)
+	$scope.requestCaptionTrack = function(videoId, trackId)
 	{
+		// Debug msg
+		console.log("Requesting track: " + trackId);
+
+		// Get saved authorization data
+		localAuth = JSON.parse(window.localStorage.getItem("auth"));
 		// This token is obtained with OAuth2 through Google in each session
-		var accessToken = "ACCESS_TOKEN";
+		var accessToken = localAuth.oauth.access_token;
 		// Developer key from Google
 		var devKey	= "AIzaSyDWuGMteyvJY65erI4Y_Iu0y5hgVSj2ESQ";
-	
 		// Host for youtube video data
-		var host = 'gdata.youtube.com/feeds/api/videos/' + videoId + '/captiondata/' + trackId;
+		var host = 'https://www.googleapis.com/youtube/v3/captions/' + trackId + "&key=" + devKey + "?access_token=" + accessToken;
+
+		//var host = "https://gdata.youtube.com/feeds/api/videos/" + videoId + "/captiondata/" + trackId;
 		// Authorization string
 		var auth = 'Bearer ' + accessToken;
+
+		// Get the caption track
+		$http({
+			method : 	'GET',
+			url : 		host,
+			headers :	{
+				'Authorization' : auth,
+				'GData-Version' : '2',
+				'X-GData-Key'	: devKey,
+			}
+					
+		}).then(function success(response){
+				console.log("CAPTION TRACK:\n" + JSON.stringify(response));
+			}, function error(response) {
+				console.log("REQ CT ERROR:\n" + JSON.stringify(response));
+			});
 	
 		// TO-DO: Maybe this can be done with angular
 		// GET request to obtain the Caption track
+		/*
 		$.ajax({
 			'url' : host,
 			'type' : 'GET',
@@ -140,6 +159,39 @@ app.controller('mainPageController', function($scope,$http){
 				alert('Request sent!');
 			}
 		});
+		*/
+	};
+
+
+	/**
+	* Obtains the list of caption tracks available for a video
+	* @methodName requestCaptionList
+	* @param videId The youtube video ID
+	*/
+	$scope.requestCaptionList = function(videoId)
+	{
+		// Get saved authorization data
+		localAuth = JSON.parse(window.localStorage.getItem("auth"));
+		// This token is obtained with OAuth2 through Google in each session
+		var accessToken = localAuth.oauth.access_token;
+		// Developer key from Google
+		var devKey	= "AIzaSyDWuGMteyvJY65erI4Y_Iu0y5hgVSj2ESQ";
+		// Authorization string
+		var auth = 'Bearer ' + accessToken;
+		// Host needed for obtaining captions
+		var host = "https://www.googleapis.com/youtube/v3/captions?part=snippet&videoId=" + videoId + "&key=" + devKey;
+
+		// Do a GET request to obtain the caption list of the video
+		$http.get(host).then(function success(response){
+				console.log("RESPONSE:\n" + JSON.stringify(response));
+				$scope.captionList = response.data;
+
+				// TEST:
+				$scope.requestCaptionTrack(videoId, response.data.items[0].id);
+			}, function error(response){
+				console.log("ERROR:\n" + JSON.stringify(response));
+				$scope.captionList = undefined;
+			});
 	}
 
 
@@ -160,5 +212,5 @@ app.controller('mainPageController', function($scope,$http){
 			var search = $scope.searchCaption("ElMikrix", captionTest);
 			console.log(" 'ElMikrix' Search: ");
 			console.log(search);
-	}
+	};
 });
