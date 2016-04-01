@@ -1,10 +1,17 @@
 /**
 Controller for Ctrl-F app.
-
 */
 var app = angular.module('ctrlfApp', []);
 app.controller('mainPageController', function($scope,$http){
-	
+	// Authorization info from Oauth
+	/*
+	$scope.auth = {
+		oauth: {
+			access_token: undefined,
+			expires_in: undefined,
+			account_username: undefined
+		}
+	};*/
 
 	/**
 	* Formats a full caption text into a list of strings
@@ -20,7 +27,7 @@ app.controller('mainPageController', function($scope,$http){
 	* @param {String} captionText text to extract caption from
 	* @return {Array[String]} Returns the separated captions
 	*/
-	formatCaption = function(captionText)
+	$scope.formatCaption = function(captionText)
 	{
 		var result = captionText.split("\n\n");
 		return result;
@@ -57,6 +64,44 @@ app.controller('mainPageController', function($scope,$http){
 		return times;
 	}
 
+	/**
+	* Oauth2 Callback
+	* Saves the token to be used later on
+	* @method oauthCallback
+	*/
+	$scope.oauthCallback = function()
+	{
+		console.log("Starting Oauth");
+		var callbackResponse = (document.URL).split("#")[1];
+		var responseParameters = (callbackResponse).split("&");
+		var parameterMap = [];
+		for(var i = 0; i < responseParameters.length; i++) {
+			parameterMap[responseParameters[i].split("=")[0]] = responseParameters[i].split("=")[1];
+		}
+		if(parameterMap.access_token !== undefined && parameterMap.access_token !== null) {
+			console.log("Got access tokens!");
+			$scope.auth = {
+				oauth: {
+					access_token: parameterMap.access_token,
+					expires_in: parameterMap.expires_in,
+					account_username: parameterMap.account_username
+				}
+			};
+			window.localStorage.setItem("google", JSON.stringify($scope.auth));
+			window.location.href = "http://localhost/Ctrl-F/ctrlf/src/main.html";
+		} else {
+			alert("Problem authenticating");
+		}
+	}
+
+	/**
+	* Debug function
+	*/
+	$scope.printAuth = function()
+	{
+		console.log("$scope.auth: " + JSON.stringify($scope.auth));
+	}
+
 
 	/**
 	* Gets a caption track from a youtube video using the Video ID
@@ -72,7 +117,7 @@ app.controller('mainPageController', function($scope,$http){
 		// This token is obtained with OAuth2 through Google in each session
 		var accessToken = "ACCESS_TOKEN";
 		// Developer key from Google
-		var devKey		= "AIzaSyDWuGMteyvJY65erI4Y_Iu0y5hgVSj2ESQ";
+		var devKey	= "AIzaSyDWuGMteyvJY65erI4Y_Iu0y5hgVSj2ESQ";
 	
 		// Host for youtube video data
 		var host = 'gdata.youtube.com/feeds/api/videos/' + videoId + '/captiondata/' + trackId;
