@@ -20,7 +20,7 @@ app.controller('mainPageController', function($scope,$http){
 	* @param {String} captionText text to extract caption from
 	* @return {Array[String]} Returns the separated captions
 	*/
-	formatCaption : function(captionText)
+	formatCaption = function(captionText)
 	{
 		var result = captionText.split("\n\n");
 		return result;
@@ -37,7 +37,7 @@ app.controller('mainPageController', function($scope,$http){
 	* @param {String} captionTrack Caption text unformatted
 	* @return {Array[String]} Returns the times where the field was found
 	*/
-	searchCaption : function(field, captionTrack)
+	searchCaption = function(field, captionTrack)
 	{
 		var times = [];
 		var caption = $scope.formatCaption(captionTrack);
@@ -67,7 +67,7 @@ app.controller('mainPageController', function($scope,$http){
 	* @param videoId The youtube video ID
 	* @param trackId The caption track ID (needs to be obtained from the track list)
 	*/
-	getCaptionTrack : function(videoId, trackId)
+	getCaptionTrack = function(videoId, trackId)
 	{
 		// This token is obtained with OAuth2 through Google in each session
 		var accessToken = "ACCESS_TOKEN";
@@ -102,7 +102,7 @@ app.controller('mainPageController', function($scope,$http){
 	/*
 	* Test function for functionality
 	*/
-	test_captionFormat : function()
+	test_captionFormat = function()
 	{
 			var captionTest = "0:01:23.000,0:01:25.000\nThis text displays for two seconds starting\n1 minute and 23 seconds into the video.\n\n0:02:20.250,0:02:23.8\nThis text displays from 2 minutes and 20.25 seconds after the start\nof the video until 2 minutes and 23.8 seconds after the start of the video.\n\n0:03:14.159\nThis text displays beginning 3 minutes and 14.159 seconds\nafter the start of the video for an undefined length of time.";
 	
