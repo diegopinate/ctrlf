@@ -15,13 +15,11 @@
 			}
 		</style>
 	</head>
-	<body ng-app="ctrlfApp" ng-controller="mainPageController" ng-init="printAuth()">
+	<body ng-app="ctrlfApp" ng-controller="mainPageController" ng-init="requestCaptionList('XEsjOIKLP74')">
 		<div id="mainDiv">
 			<iframe width="420" height="315"  ng-src={{url}}></iframe>
 			<div id="videoURL">
 				<label for="urlBar">URL: </label>
 				<input id="urlBar" class="textInput" placeholder=" paste YouTube video URL" ng-model="searchValue" ng-keyup="getUrl(searchValue)"> 
-			<div>
-		</div>
 	</body>
 </html>
