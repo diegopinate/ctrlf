@@ -2,15 +2,8 @@
 Controller for Ctrl-F app.
 */
 var app = angular.module('ctrlfApp', []);
-app.controller('mainPageController', function($scope,$http){
+app.controller('mainPageController', [ '$scope', '$http', '$sce', function($scope,$http, $sce){
 	// Authorization info from Oauth
-	$scope.auth = {
-		oauth: {
-			access_token: "",
-			expires_in: "",
-			account_username: ""
-		}
-	}
 
 	/**
 	* Formats a full caption text into a list of strings
@@ -161,4 +154,33 @@ app.controller('mainPageController', function($scope,$http){
 			console.log(" 'ElMikrix' Search: ");
 			console.log(search);
 	}
-});
+
+/*-----------------------------------------------------------------------------------------------------------------------------
+*****************************************URL BAR **************************************************
+--------------------------------------------------------------------------------------------------------------------------------*/
+	/*
+	*  Creates correct Url string for ng-src attribute in iframe tag
+	*  @param String: searchValue, the youtube url the user enters in input box
+	*/
+	$scope.getUrl = function(input){
+		var urlEnd = getEndOfUrl(input); //returns the end to be appended to the youtubeUrl
+		var youtubeUrl = "https://www.youtube.com/embed/" + urlEnd;
+		$scope.url = $sce.trustAsResourceUrl(youtubeUrl);
+	};
+	
+	/*
+	* Parses any of the two type of youtube url strings to get the video identifier
+	* @param String: url, the url the user inputs in the input tag id="urlBar"
+	*/
+	function getEndOfUrl(url){
+		if(url){ //to make sure it's defined
+			if( url.substring(0, 17) === "https://youtu.be/"){ //shortened url
+				return url.substring(17);
+			} else if(url.substring(0, 32) === "https://www.youtube.com/watch?v="){
+				return url.substring(32);
+			} else{ 
+				alert("You must enter a valid YouTube URL");
+			}
+		}
+	}
+}]);

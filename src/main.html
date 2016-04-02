@@ -7,10 +7,21 @@
 		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
 		 <script src="ctrlfApp.js"></script>
 		<title>Search Video Caption</title>
+		<style>
+			.textInput {
+				width: 250px;
+				-webkit-transition: ease-in-out, width .35s ease-in-out;
+				transition: ease-in-out,width .35s ease-in-out;
+			}
+		</style>
 	</head>
 	<body ng-app="ctrlfApp" ng-controller="mainPageController" ng-init="printAuth()">
 		<div id="mainDiv">
-			<iframe with="420" height="315"  src="http://www.youtube.com/embed/_FrOQC-zEog"></iframe>
+			<iframe width="420" height="315"  ng-src={{url}}></iframe>
+			<div id="videoURL">
+				<label for="urlBar">URL: </label>
+				<input id="urlBar" class="textInput" placeholder=" paste YouTube video URL" ng-model="searchValue" ng-keyup="getUrl(searchValue)"> 
+			<div>
 		</div>
 	</body>
 </html>
